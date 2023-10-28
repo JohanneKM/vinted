@@ -9,9 +9,20 @@ const encBase64 = require("crypto-js/enc-base64"); // sert à transformer l'encr
 
 const User = require("../models/User");
 
+cloudinary.config({
+  cloud_name: "dnbtkdwub",
+  api_key: "397527211794692",
+  api_secret: "kqdlInTjO5XkAR0yywOoG6GCG5A",
+});
+
+// fonction pour convertir un buffer en base64
+const convertToBase64 = (file) => {
+  return `data:${file.mimetype};base64,${file.data.toString("base64")}`;
+};
+
 // ROUTE POST POUR CRÉER UN UTILISATEUR
 
-router.post("/user/signup", async (req, res) => {
+router.post("/user/signup", fileUpload(), async (req, res) => {
   const user = await User.findOne({ email: req.body.email });
 
   // si le username n'est pas renseigné
@@ -37,12 +48,19 @@ router.post("/user/signup", async (req, res) => {
     const token = uid2(64);
     console.log("token ==> ", token);
 
+    // on convertit l'avatar reçu en base 64 et on l'envoie sur cloudinary
+    const avatarToUpload = req.files.avatar;
+    const result = await cloudinary.uploader.upload(
+      convertToBase64(avatarToUpload)
+    );
+
     // on créer un nouveau User
 
     const newUser = new User({
       email: req.body.email,
       account: {
         username: req.body.username,
+        avatar: req.files.avatar,
       },
       newsletter: req.body.newsletter,
       token: token,
@@ -58,6 +76,7 @@ router.post("/user/signup", async (req, res) => {
 
     console.log(user);
     //   console.log(typeof user);
+    console.log(req.files.avatar);
 
     res.json({
       _id: user._id,
