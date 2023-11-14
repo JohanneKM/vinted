@@ -49,10 +49,12 @@ router.post("/user/signup", fileUpload(), async (req, res) => {
     console.log("token ==> ", token);
 
     // on convertit l'avatar reçu en base 64 et on l'envoie sur cloudinary
-    const avatarToUpload = req.files.avatar;
-    const result = await cloudinary.uploader.upload(
-      convertToBase64(avatarToUpload)
-    );
+    // if (req.files.avatar) {
+    //   const avatarToUpload = req.files.avatar;
+    //   const result = await cloudinary.uploader.upload(
+    //     convertToBase64(avatarToUpload)
+    //   );
+    // }
 
     // on créer un nouveau User
 
@@ -60,7 +62,7 @@ router.post("/user/signup", fileUpload(), async (req, res) => {
       email: req.body.email,
       account: {
         username: req.body.username,
-        avatar: req.files.avatar,
+        // avatar: req.files.avatar,
       },
       newsletter: req.body.newsletter,
       token: token,
@@ -76,7 +78,7 @@ router.post("/user/signup", fileUpload(), async (req, res) => {
 
     console.log(user);
     //   console.log(typeof user);
-    console.log(req.files.avatar);
+    // console.log(req.files.avatar);
 
     res.json({
       _id: user._id,
